@@ -98,11 +98,11 @@
             android:text="Return" />
 
         <Button
-            android:id="@+id/normalButton"
+            android:id="@+id/UndoButton"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:text="Normal" />
+            android:text="Undo Changes" />
 
         <Button
             android:id="@+id/saveButton"

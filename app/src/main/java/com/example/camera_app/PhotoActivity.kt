@@ -64,7 +64,7 @@ class PhotoActivity : AppCompatActivity() {
             editPhotoSobel()
         }
 
-        viewBinding.normalButton.setOnClickListener {
+        viewBinding.UndoButton.setOnClickListener {
             undoEdit()
         }
     }
@@ -78,13 +78,11 @@ class PhotoActivity : AppCompatActivity() {
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
-        // Get the orientation from EXIF data
         val exif = uri.let { contentResolver.openInputStream(it) }?.use { inputStream ->
             ExifInterface(inputStream)
         }
         val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
 
-        // Create a matrix to perform transformations
         val matrix = Matrix()
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
@@ -92,7 +90,6 @@ class PhotoActivity : AppCompatActivity() {
             ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
         }
 
-        // Create a correctly oriented bitmap
         val orientedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
 
         val width = orientedBitmap.width
@@ -136,13 +133,11 @@ class PhotoActivity : AppCompatActivity() {
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
-        // Get the orientation from EXIF data
         val exif = uri.let { contentResolver.openInputStream(it) }?.use { inputStream ->
             ExifInterface(inputStream)
         }
         val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
 
-        // Create a matrix to perform transformations
         val matrix = Matrix()
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
@@ -150,7 +145,6 @@ class PhotoActivity : AppCompatActivity() {
             ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
         }
 
-        // Create a correctly oriented bitmap
         val orientedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
 
         val sepiaBitmap = Bitmap.createBitmap(orientedBitmap.width, orientedBitmap.height, Bitmap.Config.ARGB_8888)
@@ -186,13 +180,11 @@ class PhotoActivity : AppCompatActivity() {
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
-        // Get the orientation from EXIF data
         val exif = uri.let { contentResolver.openInputStream(it) }?.use { inputStream ->
             ExifInterface(inputStream)
         }
         val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
 
-        // Create a matrix to perform transformations
         val matrix = Matrix()
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
@@ -200,7 +192,6 @@ class PhotoActivity : AppCompatActivity() {
             ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
         }
 
-        // Create a correctly oriented bitmap
         val orientedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
 
         val negativeBitmap = Bitmap.createBitmap(orientedBitmap.width, orientedBitmap.height, Bitmap.Config.ARGB_8888)
@@ -231,13 +222,11 @@ class PhotoActivity : AppCompatActivity() {
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
-        // Get the orientation from EXIF data
         val exif = uri.let { contentResolver.openInputStream(it) }?.use { inputStream ->
             ExifInterface(inputStream)
         }
         val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
 
-        // Create a matrix to perform transformations
         val matrix = Matrix()
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
@@ -245,7 +234,6 @@ class PhotoActivity : AppCompatActivity() {
             ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
         }
 
-        // Create a correctly oriented bitmap
         val orientedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
 
         val grayScaleBitmap = Bitmap.createBitmap(orientedBitmap.width, orientedBitmap.height, Bitmap.Config.ARGB_8888)
