@@ -358,7 +358,7 @@ class PhotoActivity : AppCompatActivity() {
         val imageUri = if (editted) editImageUri else originalImageUri
         val resolver = contentResolver
         val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, imageUri)
+            put(MediaStore.MediaColumns.DISPLAY_NAME,"CameraXTde_" +  imageUri)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(MediaStore.MediaColumns.RELATIVE_PATH, "DCIM/")
