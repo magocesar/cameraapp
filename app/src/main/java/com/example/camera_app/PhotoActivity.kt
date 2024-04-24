@@ -1,5 +1,6 @@
 package com.example.camera_app
 
+import android.app.ProgressDialog
 import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -26,31 +27,19 @@ class PhotoActivity : AppCompatActivity() {
     private var originalImageUri: String? = null
     private lateinit var editImageUri: String
     private var editted = false
-    private lateinit var brightnessSeekBar: SeekBar
-    private lateinit var contrastSeekBar: SeekBar
-
-
     private var brightnessValue = 0
     private var contrastValue = 0
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoActivityBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        brightnessSeekBar = findViewById(R.id.brightnessSeekBar)
-        contrastSeekBar = findViewById(R.id.contrastSeekBar)
+        originalImageUri = intent.getStringExtra("photo_uri").toString()
 
-        originalImageUri = intent.getStringExtra("photo_uri")
+        editImageUri = originalImageUri.toString()
 
-        val imageUri = intent.getStringExtra("photo_uri")
-
-        editImageUri = imageUri.toString()
-
-        viewBinding.photoView.setImageURI(Uri.parse(imageUri))
-
-
+        viewBinding.photoView.setImageURI(Uri.parse(originalImageUri))
 
         viewBinding.returnButton.setOnClickListener {
             finish()
@@ -80,7 +69,7 @@ class PhotoActivity : AppCompatActivity() {
             undoEdit()
         }
 
-        brightnessSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        viewBinding.brightnessSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 brightnessValue = progress
                 applyBrightnessAndContrast()
@@ -91,7 +80,7 @@ class PhotoActivity : AppCompatActivity() {
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
-        contrastSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        viewBinding.contrastSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 contrastValue = progress
                 applyBrightnessAndContrast()
@@ -101,6 +90,14 @@ class PhotoActivity : AppCompatActivity() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+    }
+
+    private fun undoEdit() {
+        viewBinding.photoView.setImageURI(Uri.parse(originalImageUri))
+        editImageUri = originalImageUri.toString()
+        editted = false
+        viewBinding.brightnessSeekBar.progress = 0
+        viewBinding.contrastSeekBar.progress = 0
     }
 
     private fun applyBrightnessAndContrast() {
@@ -130,8 +127,13 @@ class PhotoActivity : AppCompatActivity() {
         val contrastFactor = 1 + contrastValue / 100f
 
         val colorMatrix = ColorMatrix().apply {
-            setScale(brightnessFactor, brightnessFactor, brightnessFactor, 1f) // Aplica brilho
-            postConcat(ColorMatrix(floatArrayOf(contrastFactor, 0f, 0f, 0f, 0f, 0f, contrastFactor, 0f, 0f, 0f, 0f, 0f, contrastFactor, 0f, 0f, 0f, 0f, 0f, 1f, 0f))) // Aplica contraste
+            setScale(brightnessFactor, brightnessFactor, brightnessFactor, 1f)
+            postConcat(ColorMatrix(floatArrayOf(
+                contrastFactor, 0f, 0f, 0f, 128f * (1 - contrastFactor),
+                0f, contrastFactor, 0f, 0f, 128f * (1 - contrastFactor),
+                0f, 0f, contrastFactor, 0f, 128f * (1 - contrastFactor),
+                0f, 0f, 0f, 1f, 0f
+            )))
         }
 
         val colorMatrixColorFilter = ColorMatrixColorFilter(colorMatrix)
@@ -151,13 +153,11 @@ class PhotoActivity : AppCompatActivity() {
         viewBinding.photoView.setImageBitmap(adjustedBitmap)
     }
 
-
-    private fun undoEdit() {
-        viewBinding.photoView.setImageURI(Uri.parse(originalImageUri))
-        editted = false
-    }
-
     private fun editPhotoSobel() {
+
+        viewBinding.brightnessSeekBar.progress = 0
+        viewBinding.contrastSeekBar.progress = 0
+
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
@@ -213,6 +213,10 @@ class PhotoActivity : AppCompatActivity() {
     }
 
     private fun editPhotoSepia() {
+
+        viewBinding.brightnessSeekBar.progress = 0
+        viewBinding.contrastSeekBar.progress = 0
+
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
@@ -260,6 +264,10 @@ class PhotoActivity : AppCompatActivity() {
     }
 
     private fun editPhotoNegative() {
+
+        viewBinding.brightnessSeekBar.progress = 0
+        viewBinding.contrastSeekBar.progress = 0
+
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
@@ -302,6 +310,10 @@ class PhotoActivity : AppCompatActivity() {
     }
 
     private fun editPhotoGrey() {
+
+        viewBinding.brightnessSeekBar.progress = 0
+        viewBinding.contrastSeekBar.progress = 0
+
         val uri = Uri.parse(originalImageUri)
         val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
 
