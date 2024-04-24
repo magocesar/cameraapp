@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.camera_app.databinding.PhotoActivityBinding
 import java.io.File
 import java.io.FileOutputStream
+import android.widget.SeekBar
 
 class PhotoActivity : AppCompatActivity() {
 
@@ -25,12 +26,21 @@ class PhotoActivity : AppCompatActivity() {
     private var originalImageUri: String? = null
     private lateinit var editImageUri: String
     private var editted = false
+    private lateinit var brightnessSeekBar: SeekBar
+    private lateinit var contrastSeekBar: SeekBar
+
+
+    private var brightnessValue = 0
+    private var contrastValue = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = PhotoActivityBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        brightnessSeekBar = findViewById(R.id.brightnessSeekBar)
+        contrastSeekBar = findViewById(R.id.contrastSeekBar)
 
         originalImageUri = intent.getStringExtra("photo_uri")
 
@@ -39,6 +49,8 @@ class PhotoActivity : AppCompatActivity() {
         editImageUri = imageUri.toString()
 
         viewBinding.photoView.setImageURI(Uri.parse(imageUri))
+
+
 
         viewBinding.returnButton.setOnClickListener {
             finish()
@@ -67,7 +79,78 @@ class PhotoActivity : AppCompatActivity() {
         viewBinding.UndoButton.setOnClickListener {
             undoEdit()
         }
+
+        brightnessSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                brightnessValue = progress
+                applyBrightnessAndContrast()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
+
+        contrastSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                contrastValue = progress
+                applyBrightnessAndContrast()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+        })
     }
+
+    private fun applyBrightnessAndContrast() {
+        val uri = Uri.parse(originalImageUri)
+        val originalBitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uri)
+
+        val exif = uri.let { contentResolver.openInputStream(it) }?.use { inputStream ->
+            ExifInterface(inputStream)
+        }
+        val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+        }
+
+        val orientedBitmap = Bitmap.createBitmap(originalBitmap, 0, 0, originalBitmap.width, originalBitmap.height, matrix, true)
+
+        val adjustedBitmap = Bitmap.createBitmap(orientedBitmap.width, orientedBitmap.height, Bitmap.Config.ARGB_8888)
+
+        val canvas = Canvas(adjustedBitmap)
+        val paint = Paint()
+
+        val brightnessFactor = 1 + brightnessValue / 100f
+        val contrastFactor = 1 + contrastValue / 100f
+
+        val colorMatrix = ColorMatrix().apply {
+            setScale(brightnessFactor, brightnessFactor, brightnessFactor, 1f) // Aplica brilho
+            postConcat(ColorMatrix(floatArrayOf(contrastFactor, 0f, 0f, 0f, 0f, 0f, contrastFactor, 0f, 0f, 0f, 0f, 0f, contrastFactor, 0f, 0f, 0f, 0f, 0f, 1f, 0f))) // Aplica contraste
+        }
+
+        val colorMatrixColorFilter = ColorMatrixColorFilter(colorMatrix)
+        paint.colorFilter = colorMatrixColorFilter
+
+        canvas.drawBitmap(orientedBitmap, 0f, 0f, paint)
+
+        val file = File(externalCacheDir, "temp.jpg")
+        val out = FileOutputStream(file)
+        adjustedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        out.flush()
+        out.close()
+
+        editImageUri = Uri.fromFile(file).toString()
+        editted = true
+
+        viewBinding.photoView.setImageBitmap(adjustedBitmap)
+    }
+
 
     private fun undoEdit() {
         viewBinding.photoView.setImageURI(Uri.parse(originalImageUri))
