@@ -56,3 +56,7 @@
   <li>César Willian Pacheco</li>
   <li>Rodrigo Munch</li>
 </ul>
+
+<p>Aplicativo desenvolvido na linguagem <strong>Kotlin</strong>, utilizando o <strong>Android Studio</strong>.</p>
+
+<p>Divirta-se explorando o aplicativo e experimentando diferentes operações de processamento de imagem!</p>
