@@ -59,4 +59,8 @@
 
 <p>Aplicativo desenvolvido na linguagem <strong>Kotlin</strong>, utilizando o <strong>Android Studio</strong>.</p>
 
+<p>Projeto feito para a matéria de <strong>Desenvolvimento para Dispositivos Móveis</strong>.</p>
+
+<p>Professor orientador: <strong>Mark Eirik Scortegagna Joselli</strong>.</p>
+
 <p>Divirta-se explorando o aplicativo e experimentando diferentes operações de processamento de imagem!</p>
